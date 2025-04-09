@@ -1,6 +1,6 @@
 {
     "version": "4.0.3",
-    "description": "WeChat 4.0, Free messaging and calling app by Tencent, Unified cross-device experience",
+    "description": "Wechat 4.0, Free messaging and calling app by Tencent, Unified cross-device experience",
     "homepage": "https://pc.weixin.qq.com/?lang=en_US",
     "license": {
         "identifier": "Proprietary",
@@ -8,36 +8,53 @@
     },
     "architecture": {
         "64bit": {
-            "url": "https://dldir1v6.qq.com/weixin/Universal/Windows/WeChatWin.exe#/dl.7z",
+            "url": "https://dldir1v6.qq.com/weixin/Universal/Windows/WeChatWin.exe",
             "hash": "0de1703d15cfff163fd9db9b94e1e831e7e26131ea412e70bb0d2796c0050390"
         }
     },
+    "pre_install": [
+        "# Create temp directory for installation",
+        "$installDir = \"$dir\\app\"",
+        "New-Item -ItemType Directory -Force -Path \"$installDir\" | Out-Null",
+
+        "# Run installer silently and extract files",
+        "Start-Process -FilePath \"$dir\\WeChatWin.exe\" -ArgumentList \"/S\", \"/D=$installDir\" -Wait",
+
+        "# Move files from installation directory to app root",
+        "Get-ChildItem -Path \"$installDir\" -Recurse | Move-Item -Destination \"$dir\" -Force",
+
+        "# Clean up temporary files",
+        "Remove-Item -Path \"$installDir\" -Recurse -Force -ErrorAction SilentlyContinue",
+        "Remove-Item -Path \"$dir\\WeChatWin.exe\" -Force -ErrorAction SilentlyContinue",
+        "Remove-Item -Path \"$dir\\$*\" -Recurse -Force -ErrorAction SilentlyContinue",
+        "Remove-Item -Path \"$dir\\Uninst*\" -Recurse -Force -ErrorAction SilentlyContinue"
+    ],
     "installer": {
         "script": [
-            "Remove-Item \"$dir\\`$*\", \"$dir\\Uninst*\" -Force -Recurse",
-            "$configpath = \"$env:APPDATA\\Tencent\\WeChat\\config\"",
-            "if (!(Test-Path \"$configpath\")) {",
-            "    New-Item -Path \"$configpath\" -ItemType Directory -Force | Out-Null",
-            "}",
-            "Set-Content -NoNewline -Path \"$configpath\\config.ini\" -Value \"[General]\nFileSavePath=$persist_dir\"",
-            "$regpath = \"HKCU:Software\\Tencent\\Weixin\"",
+            "$configpath = \"$env:APPDATA\\Tencent\\xwechat\\config\"",
+            "ensure \"$configpath\" | Out-Null",
+            "Set-Content -NoNewline -Path \"$configpath\\51a1fffea11325a1e4104c6b3de47af7.ini\" -Value \"$persist_dir\"",
+            "$regpath = \"HKCU:Software\\Tencent\\Wexin\"",
             "if (!(Test-Path \"$regpath\")) {",
-            "    New-Item -Path \"$regpath\" -Force | Out-Null",
+            "    New-Item -Path \"$regpath\" -Type Directory -Force | Out-Null",
             "}",
             "New-ItemProperty -Path $regpath -Name \"FileSavePath\" -Value \"$persist_dir\" -Force | Out-Null"
         ]
     },
+    "bin": [
+        ["WeChat.exe", "wechat"]
+    ],
     "shortcuts": [
         [
             "WeChat.exe",
             "WeChat"
         ]
     ],
-    "persist": "WeChat Files",
+    "persist": "xwechat_files",
     "uninstaller": {
         "script": [
-            "Remove-Item -Path \"$env:APPDATA\\Tencent\\WeChat\\config\\config.ini\" -Force -ErrorAction SilentlyContinue",
-            "Remove-ItemProperty -Path \"HKCU:Software\\Tencent\\Weixin\" -Name \"FileSavePath\" -Force -ErrorAction SilentlyContinue"
+            "Remove-Item -Path \"$env:APPDATA\\Tencent\\xwechat\\config\\51a1fffea11325a1e4104c6b3de47af7.ini\" -Force -ErrorAction SilentlyContinue",
+            "Remove-ItemProperty -Path \"HKCU:Software\\Tencent\\Wexin\" -Name \"FileSavePath\" -Force -ErrorAction SilentlyContinue"
         ]
     },
     "checkver": {
@@ -47,7 +64,7 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://dldir1v6.qq.com/weixin/Universal/Windows/WeChatWin.exe#/dl.7z"
+                "url": "https://dldir1v6.qq.com/weixin/Universal/Windows/WeChatWin.exe"
             }
         }
     }
