@@ -12,7 +12,6 @@
             "hash": "0de1703d15cfff163fd9db9b94e1e831e7e26131ea412e70bb0d2796c0050390"
         }
     },
-    "extract_dir": "WeChatWin",
     "installer": {
         "script": [
             "Remove-Item \"$dir\\`$*\", \"$dir\\Uninst*\" -Force -Recurse",
