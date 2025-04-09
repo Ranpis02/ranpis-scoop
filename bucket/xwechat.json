@@ -1,6 +1,6 @@
 {
     "version": "4.0.3",
-    "description": "Wechat 4.0, Free messaging and calling app by Tencent, Unified cross-device experience",
+    "description": "WeChat 4.0, Free messaging and calling app by Tencent, Unified cross-device experience",
     "homepage": "https://pc.weixin.qq.com/?lang=en_US",
     "license": {
         "identifier": "Proprietary",
@@ -15,27 +15,29 @@
     "installer": {
         "script": [
             "Remove-Item \"$dir\\`$*\", \"$dir\\Uninst*\" -Force -Recurse",
-            "$configpath = \"$env:APPDATA\\Tencent\\xwechat\\config\"",
-            "ensure \"$configpath\" | Out-Null",
-            "Set-Content -NoNewline -Path \"$configpath\\51a1fffea11325a1e4104c6b3de47af7.ini\" -Value \"$persist_dir\"",
-            "$regpath = \"HKCU:Software\\Tencent\\Wexin\"",
+            "$configpath = \"$env:APPDATA\\Tencent\\WeChat\\config\"",
+            "if (!(Test-Path \"$configpath\")) {",
+            "    New-Item -Path \"$configpath\" -ItemType Directory -Force | Out-Null",
+            "}",
+            "Set-Content -NoNewline -Path \"$configpath\\config.ini\" -Value \"[General]\nFileSavePath=$persist_dir\"",
+            "$regpath = \"HKCU:Software\\Tencent\\Weixin\"",
             "if (!(Test-Path \"$regpath\")) {",
-            "    New-Item -Path \"$regpath\" -Type Directory -Force | Out-Null",
+            "    New-Item -Path \"$regpath\" -Force | Out-Null",
             "}",
             "New-ItemProperty -Path $regpath -Name \"FileSavePath\" -Value \"$persist_dir\" -Force | Out-Null"
         ]
     },
     "shortcuts": [
         [
-            "Weixin.exe",
+            "WeChat.exe",
             "WeChat"
         ]
     ],
-    "persist": "xwechat_files",
+    "persist": "WeChat Files",
     "uninstaller": {
         "script": [
-            "Remove-Item -Path \"$env:APPDATA\\Tencent\\xwechat\\config\\51a1fffea11325a1e4104c6b3de47af7.ini\" -Force | Out-Null",
-            "Remove-ItemProperty -Path \"HKCU:Software\\Tencent\\Wexin\" -Name \"FileSavePath\" -Force | Out-Null"
+            "Remove-Item -Path \"$env:APPDATA\\Tencent\\WeChat\\config\\config.ini\" -Force -ErrorAction SilentlyContinue",
+            "Remove-ItemProperty -Path \"HKCU:Software\\Tencent\\Weixin\" -Name \"FileSavePath\" -Force -ErrorAction SilentlyContinue"
         ]
     },
     "checkver": {
